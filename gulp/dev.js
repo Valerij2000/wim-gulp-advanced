@@ -12,6 +12,7 @@ const webpack = require('webpack-stream');
 const babel = require('gulp-babel');
 const imagemin = require('gulp-imagemin');
 const changed = require('gulp-changed');
+const svgSprite = require('gulp-svg-sprite');
 
 gulp.task('clean:dev', function (done) {
 	if (fs.existsSync('./build/')) {
@@ -70,6 +71,20 @@ gulp.task('images:dev', function () {
 		.pipe(gulp.dest('./build/img/'));
 });
 
+gulp.task('sprite:dev', function () {
+	return gulp
+		.src('./src/img/svg/*.svg')
+		.pipe(svgSprite({
+      mode: {
+        stack: {
+          sprite: '../svg/sprite.svg',
+          example: true // превью всех свгшек , можно не включать
+        }
+      }
+    }))
+    .pipe(gulp.dest('./build/img/'));
+});
+
 gulp.task('fonts:dev', function () {
 	return gulp
 		.src('./src/fonts/**/*')
@@ -113,6 +128,7 @@ gulp.task('server:dev', function () {
 gulp.task('watch:dev', function () {
 	gulp.watch('./src/scss/**/*.scss', gulp.parallel('sass:dev'));
 	gulp.watch('./src/html/**/*.*', gulp.parallel('html:dev'));
+	gulp.watch('./src/img/svg/*.svg', gulp.parallel('sprite:dev'));
 	gulp.watch('./src/img/**/*', gulp.parallel('images:dev'));
 	gulp.watch('./src/fonts/**/*', gulp.parallel('fonts:dev'));
 	gulp.watch('./src/files/**/*', gulp.parallel('files:dev'));

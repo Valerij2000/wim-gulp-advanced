@@ -22,6 +22,8 @@ const notify = require('gulp-notify');
 const webpack = require('webpack-stream');
 const babel = require('gulp-babel');
 const changed = require('gulp-changed');
+const svgSprite = require('gulp-svg-sprite');
+const webpHtmlNosvg = require('gulp-webp-html-nosvg');
 
 // Images
 const imagemin = require('gulp-imagemin');
@@ -55,6 +57,7 @@ const plumberNotify = (title) => {
 gulp.task('html:docs', function () {
 	return gulp
 		.src(['./src/html/**/*.html', '!./src/html/blocks/**/*.html'])
+		.pipe(webpHtmlNosvg())
 		.pipe(changed('./docs/'))
 		.pipe(plumber(plumberNotify('HTML')))
 		.pipe(fileInclude(fileIncludeSetting))
@@ -89,6 +92,19 @@ gulp.task('images:docs', function () {
 		.pipe(changed('./docs/img/'))
 		.pipe(imagemin({ verbose: true }))
 		.pipe(gulp.dest('./docs/img/'));
+});
+
+gulp.task('sprite:docs', function () {
+	return gulp
+		.src('./src/img/svg/*.svg')
+		.pipe(svgSprite({
+      mode: {
+        stack: {
+          sprite: '../svg/sprite.svg',
+        }
+      }
+    }))
+    .pipe(gulp.dest('./docs/img/'));
 });
 
 gulp.task('fonts:docs', function () {
